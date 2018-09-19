@@ -4,31 +4,31 @@ import sys
 
 
 def load_data(filepath):
-    with open(filepath) as f:
-        data = json.load(f)
+    with open(filepath) as json_file:
+        data = json.load(json_file)
         return data
 
 
 def get_biggest_bar(data):
-    max_elem = max(
+    biggest = max(
         data["features"], key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"]
     )
-    return max_elem
+    return biggest
 
 
 def get_smallest_bar(data):
-    min_elem = min(
+    smallest = min(
         data["features"], key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"]
     )
-    return min_elem
+    return smallest
 
 
-def degree_to_rad(deegrees):
+def convert_degree_to_rad(deegrees):
     return (math.pi / 180) * deegrees
 
 
 def get_closest_bar(data, longitude, latitude):
-    def calc_distance(bar):
+    def calculate_distance(bar):
         bar_longitude, bar_latitude = bar["geometry"]["coordinates"]
         delta_longitude = bar_longitude - longitude
         delta_latitude = bar_latitude - latitude
@@ -39,7 +39,7 @@ def get_closest_bar(data, longitude, latitude):
         )
         return distance
 
-    return min(data["features"], key=calc_distance)
+    return min(data["features"], key=calculate_distance)
 
 
 if __name__ == "__main__":
