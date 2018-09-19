@@ -3,22 +3,22 @@ import math
 import sys
 
 
-def load_data(filepath):
+def get_bar_features(filepath):
     with open(filepath) as json_file:
-        data = json.load(json_file)
-        return data
+        bar_features = json.load(json_file)["features"]
+        return bar_features
 
 
-def get_biggest_bar(data):
+def get_biggest_bar(bar_features):
     biggest = max(
-        data["features"], key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"]
+        bar_features, key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"]
     )
     return biggest
 
 
-def get_smallest_bar(data):
+def get_smallest_bar(bar_features):
     smallest = min(
-        data["features"], key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"]
+        bar_features, key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"]
     )
     return smallest
 
@@ -27,25 +27,26 @@ def convert_degree_to_rad(deegrees):
     return (math.pi / 180) * deegrees
 
 
-def get_closest_bar(data, longitude, latitude):
+def get_closest_bar(bar_features, longitude, latitude):
     def calculate_distance(bar):
         bar_longitude, bar_latitude = bar["geometry"]["coordinates"]
-        delta_longitude = bar_longitude - longitude
-        delta_latitude = bar_latitude - latitude
-        mean_latitude = (bar_latitude + latitude) / 2
+        delta_longitude = convert_degree_to_rad(bar_longitude - longitude)
+        delta_latitude = convert_degree_to_rad(bar_latitude - latitude)
+        mean_latitude = convert_degree_to_rad((bar_latitude + latitude) / 2)
         earth_radius = 6371
+
         distance = earth_radius * math.sqrt(
             delta_latitude ** 2 + (math.cos(mean_latitude) * delta_longitude) ** 2
         )
         return distance
 
-    return min(data["features"], key=calculate_distance)
+    return min(bar_features, key=calculate_distance)
 
 
 if __name__ == "__main__":
-    data = load_data("bars.json")
-    biggest = get_biggest_bar(data)
-    smallest = get_smallest_bar(data)
+    bar_features = get_bar_features("bars.json")
+    biggest = get_biggest_bar(bar_features)
+    smallest = get_smallest_bar(bar_features)
 
     print(
         "Biggest:",
@@ -68,11 +69,11 @@ if __name__ == "__main__":
             sys.exit()
 
         longitude = float(input("Your longitude: "))
-        if longitude < -180 or longitude > 180:
+        if longitude <= -180 or longitude > 180:
             print("Incorrect longitude value")
             sys.exit()
 
-        closest = get_closest_bar(data, longitude, latitude)
+        closest = get_closest_bar(bar_features, longitude, latitude)
         print(
             "Closest:",
             closest["properties"]["Attributes"]["Name"],
