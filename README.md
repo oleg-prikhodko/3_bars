@@ -1,6 +1,7 @@
 # Ближайшие бары
 
-[FIXME. Здесь будет описание проекта]
+Скрипт выводит название наибольшего и наименьшего бара исходя из количества посадочных мест,
+а так же ближайший к введенным gps координатам бар
 
 # Как запустить
 
@@ -11,7 +12,11 @@
 ```bash
 
 $ python bars.py # possibly requires call of python3 executive instead of just python
-# FIXME вывести пример ответа скрипта
+Biggest: Спорт бар «Красная машина» , seats: 450
+Smallest: Сушистор , seats: 0
+Your latitude: 55.3
+Your longitude: 36.1
+Closest: Корпорация Бар , latitude: 55.2 , longitude: 37.0
 
 ```
 
