@@ -5,9 +5,10 @@ import sys
 from functools import partial
 
 
-def get_bar_features(
-    filepath=path.join(path.dirname(path.abspath(__file__)), "bars.json")
-):
+def get_bar_features(filepath):
+    if filepath is None:
+        filepath = path.join(path.dirname(path.abspath(__file__)), "bars.json")
+
     with open(filepath) as json_file:
         bar_features = json.load(json_file)["features"]
         return bar_features
@@ -61,44 +62,40 @@ def print_bar_info(bar, message=""):
     print(output_string)
 
 
-def is_valid_latitude(latitude):
+def is_valid_coordinates(latitude, longitude):
     if latitude < -90 or latitude > 90:
         return False
-    return True
-
-
-def is_valid_longitude(longitude):
     if longitude <= -180 or longitude > 180:
         return False
     return True
 
 
-if __name__ == "__main__":
-    try:
-        if len(sys.argv) > 1:
-            bar_features = get_bar_features(sys.argv[1])
-        else:
-            bar_features = get_bar_features()
-    except FileNotFoundError:
-        sys.exit("No such file")
-    except json.JSONDecodeError:
-        sys.exit("File contents is not a valid JSON document")
-    except KeyError:
-        sys.exit("JSON document should have 'features' field in it")
+def main():
+    filepath = sys.argv[1] if len(sys.argv) > 1 else None
+    bar_features = get_bar_features(filepath)
 
     biggest = get_biggest_bar(bar_features)
     smallest = get_smallest_bar(bar_features)
     print_bar_info(biggest, message="Biggest: ")
     print_bar_info(smallest, message="Smallest: ")
 
-    try:
-        latitude = float(input("Your latitude: "))
-        longitude = float(input("Your longitude: "))
-    except ValueError:
-        sys.exit("Incorrect input data, should be digits")
-
-    if not is_valid_latitude(latitude) or not is_valid_longitude(longitude):
-        sys.exit("Incorrect coordinate values")
+    latitude = float(input("Your latitude: "))
+    longitude = float(input("Your longitude: "))
+    if not is_valid_coordinates(latitude, longitude):
+        raise ValueError("Incorrect coordinate values")
 
     closest = get_closest_bar(bar_features, longitude, latitude)
     print_bar_info(closest, message="Closest: ")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except FileNotFoundError:
+        sys.exit("No such file")
+    except json.JSONDecodeError:
+        sys.exit("File contents is not a valid JSON document")
+    except KeyError:
+        sys.exit("JSON document should have 'features' field in it")
+    except ValueError as err:
+        sys.exit(err)
