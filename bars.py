@@ -95,7 +95,5 @@ if __name__ == "__main__":
         sys.exit("No such file")
     except json.JSONDecodeError:
         sys.exit("File contents is not a valid JSON document")
-    except KeyError as err:
-        sys.exit("Field {} not found".format(err))
     except ValueError as err:
         sys.exit(err)
