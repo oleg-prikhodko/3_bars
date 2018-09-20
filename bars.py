@@ -4,10 +4,21 @@ import sys
 from functools import partial
 
 
-def get_bar_features(filepath):
-    with open(filepath) as json_file:
-        bar_features = json.load(json_file)["features"]
-        return bar_features
+def get_bar_features(filepath="bars.json"):
+    try:
+        with open(filepath) as json_file:
+            bar_features = json.load(json_file)["features"]
+            return bar_features
+    except FileNotFoundError:
+        sys.exit("No such file")
+    except OSError:
+        sys.exit("File cannot be opened")
+    except UnicodeDecodeError:
+        sys.exit("Not a text file")
+    except json.JSONDecodeError:
+        sys.exit("File contents is not a valid JSON document")
+    except KeyError:
+        sys.exit("JSON document should have 'features' field in it")
 
 
 def get_biggest_bar(bar_features):
@@ -48,7 +59,11 @@ def get_closest_bar(bar_features, longitude, latitude):
 
 
 if __name__ == "__main__":
-    bar_features = get_bar_features("bars.json")
+    if len(sys.argv) > 1:
+        bar_features = get_bar_features(sys.argv[1])
+    else:
+        bar_features = get_bar_features()
+
     biggest = get_biggest_bar(bar_features)
     smallest = get_smallest_bar(bar_features)
 
@@ -69,13 +84,11 @@ if __name__ == "__main__":
     try:
         latitude = float(input("Your latitude: "))
         if latitude < -90 or latitude > 90:
-            print("Incorrect latitude value")
-            sys.exit()
+            sys.exit("Incorrect latitude value")
 
         longitude = float(input("Your longitude: "))
         if longitude <= -180 or longitude > 180:
-            print("Incorrect longitude value")
-            sys.exit()
+            sys.exit("Incorrect longitude value")
 
         closest = get_closest_bar(bar_features, longitude, latitude)
         print(
@@ -87,4 +100,4 @@ if __name__ == "__main__":
             closest["geometry"]["coordinates"][0],
         )
     except ValueError:
-        print("Incorrect input data, should be digits")
+        sys.exit("Incorrect input data, should be digits")
