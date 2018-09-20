@@ -1,17 +1,21 @@
 # Ближайшие бары
 
 Скрипт выводит название наибольшего и наименьшего бара исходя из количества посадочных мест,
-а так же ближайший к введенным gps координатам бар
+а также ближайший к введенным gps координатам бар
 
 # Как запустить
 
-Скрипт требует для своей работы установленного интерпретатора Python версии 3.5
+Скрипт требует для своей работы установленного интерпретатора Python версии 3.5,
+а также файл с данными о московских барах, который можно взять с [data.mos.ru](https://data.mos.ru/opendata/7710881420-bary) или скачать [отсюда](https://yadi.sk/d/kn9MMtcxOqc7DQ)
+
+Путь к файлу указывается в виде аргумента к скрипту. Если же аргумент отсутствует: 
+скрипт будет искать файл bars.json в том же каталоге, в котором находится bars.py
 
 Запуск на Linux:
 
 ```bash
 
-$ python bars.py # possibly requires call of python3 executive instead of just python
+$ python bars.py [filepath] # possibly requires call of python3 executive instead of just python
 Biggest: Спорт бар «Красная машина» , seats: 450
 Smallest: Сушистор , seats: 0
 Your latitude: 55.3
