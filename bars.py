@@ -58,6 +58,16 @@ def get_closest_bar(bar_features, longitude, latitude):
     )
 
 
+def print_bar_info(bar):
+    output = "{name}, seats: {seats}, latitude: {lat:.3f}, longitude: {lon:.3f}".format(
+        name=bar["properties"]["Attributes"]["Name"],
+        seats=bar["properties"]["Attributes"]["SeatsCount"],
+        lat=bar["geometry"]["coordinates"][1],
+        lon=bar["geometry"]["coordinates"][0],
+    )
+    print(output)
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         bar_features = get_bar_features(sys.argv[1])
@@ -67,19 +77,11 @@ if __name__ == "__main__":
     biggest = get_biggest_bar(bar_features)
     smallest = get_smallest_bar(bar_features)
 
-    print(
-        "Biggest:",
-        biggest["properties"]["Attributes"]["Name"],
-        ", seats:",
-        biggest["properties"]["Attributes"]["SeatsCount"],
-    )
+    print("Biggest:")
+    print_bar_info(biggest)
 
-    print(
-        "Smallest:",
-        smallest["properties"]["Attributes"]["Name"],
-        ", seats:",
-        smallest["properties"]["Attributes"]["SeatsCount"],
-    )
+    print("Smallest:")
+    print_bar_info(smallest)
 
     try:
         latitude = float(input("Your latitude: "))
@@ -91,13 +93,7 @@ if __name__ == "__main__":
             sys.exit("Incorrect longitude value")
 
         closest = get_closest_bar(bar_features, longitude, latitude)
-        print(
-            "Closest:",
-            closest["properties"]["Attributes"]["Name"],
-            ", latitude:",
-            closest["geometry"]["coordinates"][1],
-            ", longitude:",
-            closest["geometry"]["coordinates"][0],
-        )
+        print("Closest:")
+        print_bar_info(closest)
     except ValueError:
         sys.exit("Incorrect input data, should be digits")
