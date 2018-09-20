@@ -1,6 +1,7 @@
 import json
 import math
 import sys
+from functools import partial
 
 
 def get_bar_features(filepath):
@@ -27,20 +28,23 @@ def convert_degree_to_rad(deegrees):
     return (math.pi / 180) * deegrees
 
 
+def calculate_distance_to_bar(longitude, latitude, bar):
+    bar_longitude, bar_latitude = bar["geometry"]["coordinates"]
+    delta_longitude = convert_degree_to_rad(longitude - bar_longitude)
+    delta_latitude = convert_degree_to_rad(latitude - bar_latitude)
+    mean_latitude = convert_degree_to_rad((latitude + bar_latitude) / 2)
+    earth_radius = 6371
+
+    distance = earth_radius * math.sqrt(
+        delta_latitude ** 2 + (math.cos(mean_latitude) * delta_longitude) ** 2
+    )
+    return distance
+
+
 def get_closest_bar(bar_features, longitude, latitude):
-    def calculate_distance(bar):
-        bar_longitude, bar_latitude = bar["geometry"]["coordinates"]
-        delta_longitude = convert_degree_to_rad(bar_longitude - longitude)
-        delta_latitude = convert_degree_to_rad(bar_latitude - latitude)
-        mean_latitude = convert_degree_to_rad((bar_latitude + latitude) / 2)
-        earth_radius = 6371
-
-        distance = earth_radius * math.sqrt(
-            delta_latitude ** 2 + (math.cos(mean_latitude) * delta_longitude) ** 2
-        )
-        return distance
-
-    return min(bar_features, key=calculate_distance)
+    return min(
+        bar_features, key=partial(calculate_distance_to_bar, longitude, latitude)
+    )
 
 
 if __name__ == "__main__":
