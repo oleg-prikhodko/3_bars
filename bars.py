@@ -1,10 +1,13 @@
 import json
 import math
+import os.path as path
 import sys
 from functools import partial
 
 
-def get_bar_features(filepath="bars.json"):
+def get_bar_features(
+    filepath=path.join(path.dirname(path.abspath(__file__)), "bars.json")
+):
     try:
         with open(filepath) as json_file:
             bar_features = json.load(json_file)["features"]
