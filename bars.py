@@ -5,27 +5,26 @@ import sys
 from functools import partial
 
 
-def get_bar_features(filepath):
-    if filepath is None:
-        filepath = path.join(path.dirname(path.abspath(__file__)), "bars.json")
-
+def get_bar_features(
+    filepath=path.join(path.dirname(path.abspath(__file__)), "bars.json")
+):
     with open(filepath) as json_file:
         bar_features = json.load(json_file)["features"]
         return bar_features
 
 
 def get_biggest_bar(bar_features):
-    biggest = max(
-        bar_features, key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"]
+    return max(
+        bar_features,
+        key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"],
     )
-    return biggest
 
 
 def get_smallest_bar(bar_features):
-    smallest = min(
-        bar_features, key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"]
+    return min(
+        bar_features,
+        key=lambda bar: bar["properties"]["Attributes"]["SeatsCount"],
     )
-    return smallest
 
 
 def convert_degree_to_rad(deegrees):
@@ -47,12 +46,16 @@ def calculate_distance_to_bar(longitude, latitude, bar):
 
 def get_closest_bar(bar_features, longitude, latitude):
     return min(
-        bar_features, key=partial(calculate_distance_to_bar, longitude, latitude)
+        bar_features,
+        key=partial(calculate_distance_to_bar, longitude, latitude),
     )
 
 
 def print_bar_info(bar, message=""):
-    output_string = "{message}{name}, seats: {seats}, latitude: {lat:.3f}, longitude: {lon:.3f}".format(
+    output_string = (
+        "{message}{name}, seats: {seats}, "
+        + "latitude: {lat:.3f}, longitude: {lon:.3f}"
+    ).format(
         name=bar["properties"]["Attributes"]["Name"],
         seats=bar["properties"]["Attributes"]["SeatsCount"],
         lat=bar["geometry"]["coordinates"][1],
@@ -70,27 +73,27 @@ def is_valid_coordinates(latitude, longitude):
     return True
 
 
-def main():
-    filepath = sys.argv[1] if len(sys.argv) > 1 else None
-    bar_features = get_bar_features(filepath)
-
-    biggest = get_biggest_bar(bar_features)
-    smallest = get_smallest_bar(bar_features)
-    print_bar_info(biggest, message="Biggest: ")
-    print_bar_info(smallest, message="Smallest: ")
-
-    latitude = float(input("Your latitude: "))
-    longitude = float(input("Your longitude: "))
-    if not is_valid_coordinates(latitude, longitude):
-        raise ValueError("Incorrect coordinate values")
-
-    closest = get_closest_bar(bar_features, longitude, latitude)
-    print_bar_info(closest, message="Closest: ")
-
-
 if __name__ == "__main__":
     try:
-        main()
+        if len(sys.argv) > 1:
+            filepath = sys.argv[1]
+            bar_features = get_bar_features(filepath)
+        else:
+            bar_features = get_bar_features()
+
+        biggest_bar = get_biggest_bar(bar_features)
+        smallest_bar = get_smallest_bar(bar_features)
+        print_bar_info(biggest_bar, message="Biggest: ")
+        print_bar_info(smallest_bar, message="Smallest: ")
+
+        latitude = float(input("Your latitude: "))
+        longitude = float(input("Your longitude: "))
+        if not is_valid_coordinates(latitude, longitude):
+            raise ValueError("Incorrect coordinate values")
+
+        closest_bar = get_closest_bar(bar_features, longitude, latitude)
+        print_bar_info(closest_bar, message="Closest: ")
+
     except FileNotFoundError:
         sys.exit("No such file")
     except json.JSONDecodeError:
