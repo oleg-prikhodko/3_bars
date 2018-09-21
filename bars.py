@@ -54,13 +54,13 @@ def get_closest_bar(bar_features, longitude, latitude):
 def print_bar_info(bar, message=""):
     output_string = (
         "{message}{name}, seats: {seats}, "
-        + "latitude: {lat:.3f}, longitude: {lon:.3f}"
-    ).format(
-        name=bar["properties"]["Attributes"]["Name"],
-        seats=bar["properties"]["Attributes"]["SeatsCount"],
-        lat=bar["geometry"]["coordinates"][1],
-        lon=bar["geometry"]["coordinates"][0],
-        message=message,
+        "latitude: {lat:.3f}, longitude: {lon:.3f}".format(
+            name=bar["properties"]["Attributes"]["Name"],
+            seats=bar["properties"]["Attributes"]["SeatsCount"],
+            lat=bar["geometry"]["coordinates"][1],
+            lon=bar["geometry"]["coordinates"][0],
+            message=message,
+        )
     )
     print(output_string)
 
@@ -73,24 +73,27 @@ def is_valid_coordinates(latitude, longitude):
     return True
 
 
+def get_user_coordinates():
+    latitude = float(input("Your latitude: "))
+    longitude = float(input("Your longitude: "))
+    if not is_valid_coordinates(latitude, longitude):
+        raise ValueError("Incorrect coordinate values")
+    return latitude, longitude
+
+
 if __name__ == "__main__":
     try:
-        if len(sys.argv) > 1:
-            filepath = sys.argv[1]
-            bar_features = get_bar_features(filepath)
-        else:
-            bar_features = get_bar_features()
+        bar_features = (
+            get_bar_features(sys.argv[1])
+            if len(sys.argv) > 1
+            else get_bar_features()
+        )
 
         biggest_bar = get_biggest_bar(bar_features)
         smallest_bar = get_smallest_bar(bar_features)
         print_bar_info(biggest_bar, message="Biggest: ")
         print_bar_info(smallest_bar, message="Smallest: ")
-
-        latitude = float(input("Your latitude: "))
-        longitude = float(input("Your longitude: "))
-        if not is_valid_coordinates(latitude, longitude):
-            raise ValueError("Incorrect coordinate values")
-
+        latitude, longitude = get_user_coordinates()
         closest_bar = get_closest_bar(bar_features, longitude, latitude)
         print_bar_info(closest_bar, message="Closest: ")
 
